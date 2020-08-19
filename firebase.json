@@ -1,0 +1,19 @@
+{
+  "hosting": [
+    {
+      "target": "ingreso-egreso-app",
+      "public": "dist/ingreso-egreso-app",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ]
+}
