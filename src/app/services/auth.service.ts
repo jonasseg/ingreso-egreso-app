@@ -2,18 +2,24 @@ import { Injectable } from '@angular/core';
 import { UserInterface } from '../shared/interfaces/user.interface';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { UserModel } from '../shared/models/user.model';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { Store } from '@ngrx/store';
+import { AppState } from '../app.reducer';
+import { setUser, unSetUser } from '../auth/auth.actions';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
+  private userSubscription: Subscription;
+
   constructor(
     private readonly auth: AngularFireAuth,
-    private readonly firestore: AngularFirestore
+    private readonly firestore: AngularFirestore,
+    private readonly store: Store<AppState>
   ) { }
 
   public async crearUsuario(usr: UserInterface): Promise<void> {
@@ -33,7 +39,16 @@ export class AuthService {
 
   public initAuthListener(): void {
     this.auth.authState.subscribe(user => {
-      console.log(user);
+      if (user) {
+        this.userSubscription = this.firestore.doc(`${user.uid}/usuario`)
+          .valueChanges()
+          .subscribe((firestoreUser: UserInterface) => {
+            this.store.dispatch(setUser({ user: firestoreUser }));
+          });
+      } else {
+        this.userSubscription.unsubscribe();
+        this.store.dispatch(unSetUser());
+      }
     });
   }
 
