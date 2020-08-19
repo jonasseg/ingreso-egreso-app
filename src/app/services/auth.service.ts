@@ -8,6 +8,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { Store } from '@ngrx/store';
 import { AppState } from '../app.reducer';
 import { setUser, unSetUser } from '../auth/auth.actions';
+import { unSetItems } from '../ingreso-egreso/ingreso-egreso.actions';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,7 @@ import { setUser, unSetUser } from '../auth/auth.actions';
 export class AuthService {
 
   private userSubscription: Subscription;
+  private _user: UserInterface;
 
   constructor(
     private readonly auth: AngularFireAuth,
@@ -43,13 +45,20 @@ export class AuthService {
         this.userSubscription = this.firestore.doc(`${user.uid}/usuario`)
           .valueChanges()
           .subscribe((firestoreUser: UserInterface) => {
+            this._user = new UserModel(firestoreUser);
             this.store.dispatch(setUser({ user: firestoreUser }));
+            this.store.dispatch(unSetItems());
           });
       } else {
+        this._user = null;
         this.userSubscription.unsubscribe();
         this.store.dispatch(unSetUser());
       }
     });
+  }
+
+  public get user(): UserInterface {
+    return { ...this._user };
   }
 
   public isAuth(): Observable<boolean> {
