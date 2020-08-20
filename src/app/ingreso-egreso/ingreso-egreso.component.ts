@@ -5,8 +5,6 @@ import { IngreoEgresoInterface } from '../shared/interfaces/ingreso-egreso.inter
 import { IngresoEgresoService } from '../services/ingreso-egreso.service';
 import { AuthService } from '../services/auth.service';
 import Swal from 'sweetalert2';
-import { Store } from '@ngrx/store';
-import { AppStateWithIngreso } from './ingreso-egreso.reducer';
 import { unSetItems } from './ingreso-egreso.actions';
 
 @Component({
@@ -15,7 +13,7 @@ import { unSetItems } from './ingreso-egreso.actions';
   styles: [
   ]
 })
-export class IngresoEgresoComponent implements OnInit, OnDestroy {
+export class IngresoEgresoComponent implements OnInit {
   public ingresoForm: FormGroup;
   public type: string;
 
@@ -23,7 +21,6 @@ export class IngresoEgresoComponent implements OnInit, OnDestroy {
     private readonly fb: FormBuilder,
     private readonly ingresoEgresoService: IngresoEgresoService,
     private authService: AuthService,
-    private readonly store: Store<AppStateWithIngreso>
   ) {
     this.type = 'ingreso';
   }
@@ -51,10 +48,6 @@ export class IngresoEgresoComponent implements OnInit, OnDestroy {
         Swal.fire('Success', 'Item creado', 'success');
       })
       .catch(err => Swal.fire('Error', err.message, 'error'));
-  }
-
-  ngOnDestroy(): void {
-    this.store.dispatch(unSetItems());
   }
 
 }
