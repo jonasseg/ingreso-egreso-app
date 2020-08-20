@@ -33,6 +33,7 @@ export class DetalleComponent implements OnInit, OnDestroy {
   }
 
   public borrar(item: IngreoEgresoInterface): void {
+    console.log(item);
     this.ingresoEgresoService.deleteItem(item.id)
       .then(() => Swal.fire('Borrado', 'Item borrado', 'success'))
       .catch(err => Swal.fire('Error', err.message, 'error'));

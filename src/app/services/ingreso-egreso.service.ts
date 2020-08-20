@@ -15,26 +15,19 @@ export class IngresoEgresoService {
     private readonly authService: AuthService
   ) { }
 
-  public crear(ingresoEgreso: IngreoEgresoInterface): Promise<DocumentReference> {
-    console.log(ingresoEgreso);
+  public crear(ingresoEgreso: IngreoEgresoInterface): Promise<void> {
+    const id = this.firestore.createId();
+    ingresoEgreso.id = id;
     return this.firestore
       .doc(`${ingresoEgreso.uid}/ingresos-egresos`)
       .collection('items')
-      .add({...ingresoEgreso});
+      .doc(id)
+      .set({...ingresoEgreso});
   }
 
   public initIngresoEgresoListener(uid: string): Observable<IngreoEgresoInterface[]> {
     return this.firestore.collection(`${uid}/ingresos-egresos/items`)
-      .snapshotChanges()
-      .pipe(
-        map(snapshot => {
-          return snapshot.map(doc => ({
-              id: doc.payload.doc.id,
-              ...doc.payload.doc.data() as any
-            })
-          );
-        })
-      );
+      .valueChanges() as Observable<IngreoEgresoInterface[]>;
   }
 
   public deleteItem(id: string): Promise<void> {
