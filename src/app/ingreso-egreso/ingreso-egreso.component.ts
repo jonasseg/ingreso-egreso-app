@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { IngresoEgresoModel } from '../shared/models/ingreso-egreso.model';
 import { IngreoEgresoInterface } from '../shared/interfaces/ingreso-egreso.interface';
 import { IngresoEgresoService } from '../services/ingreso-egreso.service';
 import { AuthService } from '../services/auth.service';
 import Swal from 'sweetalert2';
+import { Store } from '@ngrx/store';
+import { AppStateWithIngreso } from './ingreso-egreso.reducer';
+import { unSetItems } from './ingreso-egreso.actions';
 
 @Component({
   selector: 'app-ingreso-egreso',
@@ -12,14 +15,15 @@ import Swal from 'sweetalert2';
   styles: [
   ]
 })
-export class IngresoEgresoComponent implements OnInit {
+export class IngresoEgresoComponent implements OnInit, OnDestroy {
   public ingresoForm: FormGroup;
   public type: string;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly ingresoEgresoService: IngresoEgresoService,
-    private authService: AuthService
+    private authService: AuthService,
+    private readonly store: Store<AppStateWithIngreso>
   ) {
     this.type = 'ingreso';
   }
@@ -41,12 +45,16 @@ export class IngresoEgresoComponent implements OnInit {
       uid: this.authService.user.uid
     });
     this.ingresoEgresoService.crear(ingresoEgreso)
-      .then(ref => {
+      .then(() => {
         this.ingresoForm.reset();
         this.type = 'ingreso';
         Swal.fire('Success', 'Item creado', 'success');
       })
       .catch(err => Swal.fire('Error', err.message, 'error'));
+  }
+
+  ngOnDestroy(): void {
+    this.store.dispatch(unSetItems());
   }
 
 }

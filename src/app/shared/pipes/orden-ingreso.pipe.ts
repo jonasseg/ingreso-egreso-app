@@ -7,6 +7,9 @@ import { IngreoEgresoInterface } from '../interfaces/ingreso-egreso.interface';
 export class OrdenIngresoPipe implements PipeTransform {
 
   transform(items: IngreoEgresoInterface[]): IngreoEgresoInterface[] {
+    if (!items.length) {
+      return items;
+    }
     return items.slice().sort((a, b) => {
       if (a.tipo === 'ingreso') {
         return -1;
